@@ -1,164 +1,66 @@
 [
   {
-    "id": "mrmzzirwsww8n",
-    "title": "Garlic Butter Pasta",
-    "category": "meal",
-    "servings": 2,
-    "time": "25 min",
+    "id": "banana-bread",
+    "title": "Banana Bread",
+    "category": "snack",
+    "servings": 10,
+    "time": "1 hr 10 min",
     "image": "",
     "made": false,
     "fav": false,
+    "updatedAt": 1784250000000,
     "ingredients": [
-      {
-        "qty": 200,
-        "unit": "g",
-        "name": "spaghetti"
-      },
-      {
-        "qty": 3,
-        "unit": "tbsp",
-        "name": "butter"
-      },
-      {
-        "qty": 4,
-        "unit": "cloves",
-        "name": "garlic, minced"
-      },
-      {
-        "qty": 0.25,
-        "unit": "cup",
-        "name": "parmesan, grated"
-      },
-      {
-        "qty": 1,
-        "unit": "pinch",
-        "name": "chili flakes"
-      },
-      {
-        "qty": 0,
-        "unit": "",
-        "name": "salt & fresh parsley to taste"
-      }
+      { "qty": 3, "unit": "", "name": "very ripe bananas (medium/large)" },
+      { "qty": 0.5, "unit": "cup", "name": "unsalted butter (8 Tbsp), at room temperature" },
+      { "qty": 0.75, "unit": "cup", "name": "granulated sugar" },
+      { "qty": 2, "unit": "", "name": "large eggs, lightly beaten" },
+      { "qty": 1.5, "unit": "cups", "name": "all-purpose flour" },
+      { "qty": 1, "unit": "tsp", "name": "baking soda" },
+      { "qty": 0.5, "unit": "tsp", "name": "salt" },
+      { "qty": 0.5, "unit": "tsp", "name": "vanilla extract" },
+      { "qty": 1, "unit": "cup", "name": "walnuts" },
+      { "qty": 0.5, "unit": "cup", "name": "raisins" }
     ],
     "steps": [
-      "Boil the spaghetti in salted water until al dente, then reserve a splash of pasta water.",
-      "Melt butter in a pan over low heat and cook the garlic until fragrant (don't brown it).",
-      "Toss in the drained pasta with a little pasta water and the chili flakes.",
-      "Off the heat, stir through parmesan and parsley. Salt to taste and serve warm."
+      "Preheat the oven to 350°F. Grease and flour a bread loaf pan (9.25 long x 5.25 wide x 2.75 deep).",
+      "Lightly roast walnuts on a skillet, continuously stirring so they won't burn. Coarsely chop and cool to room temperature.",
+      "In a mixing bowl, cream together the softened butter and sugar (or honey if using honey).",
+      "Mash bananas with a fork until the consistency of chunky applesauce and add them to the batter along with the eggs, mixing until blended.",
+      "In a separate bowl, whisk together the flour, baking soda and salt, then add to the batter.",
+      "Add the vanilla extract and mix in the chopped walnuts and raisins. Pour into the prepared loaf pan.",
+      "Bake at 350°F for 55–60 min, or until a toothpick inserted into the center comes out clean. Let the banana bread rest for 10 min before transferring to a wire rack to cool."
     ],
-    "notes": "Our cozy Friday-night go-to. Add shrimp to make it fancy 💕",
-    "updatedAt": 1784176254638
+    "notes": "Prep 10 min, bake ~1 hour. The sugar can be swapped for honey 🍯"
   },
   {
-    "id": "mrmzzirwd0xac",
-    "title": "Chewy Chocolate Chip Cookies",
+    "id": "arsenios-crunch-cookie",
+    "title": "arsenio's crunch cookie 🍪",
     "category": "dessert",
-    "servings": 12,
-    "time": "30 min",
+    "servings": 6,
+    "time": "12 min bake",
     "image": "",
     "made": false,
     "fav": false,
+    "updatedAt": 1784250000001,
     "ingredients": [
-      {
-        "qty": 1,
-        "unit": "cup",
-        "name": "butter, softened"
-      },
-      {
-        "qty": 1,
-        "unit": "cup",
-        "name": "brown sugar"
-      },
-      {
-        "qty": 0.5,
-        "unit": "cup",
-        "name": "white sugar"
-      },
-      {
-        "qty": 2,
-        "unit": "",
-        "name": "eggs"
-      },
-      {
-        "qty": 2.25,
-        "unit": "cups",
-        "name": "flour"
-      },
-      {
-        "qty": 1,
-        "unit": "tsp",
-        "name": "baking soda"
-      },
-      {
-        "qty": 2,
-        "unit": "cups",
-        "name": "chocolate chips"
-      }
+      { "qty": 1, "unit": "cup", "name": "sugar (200g)" },
+      { "qty": 1.5, "unit": "cups", "name": "brown sugar (300g)" },
+      { "qty": 2, "unit": "tsp", "name": "salt" },
+      { "qty": 1, "unit": "cup", "name": "butter (225g)" },
+      { "qty": 2, "unit": "", "name": "eggs" },
+      { "qty": 2, "unit": "tsp", "name": "vanilla extract" },
+      { "qty": 2.5, "unit": "cups", "name": "all-purpose flour (315g)" },
+      { "qty": 1, "unit": "tsp", "name": "baking soda" },
+      { "qty": 0, "unit": "", "name": "chocolate chips (measure with your eyes 😮‍🔥)" }
     ],
     "steps": [
-      "Cream the butter with both sugars until fluffy.",
-      "Beat in the eggs one at a time.",
-      "Mix in flour and baking soda, then fold in the chocolate chips.",
-      "Scoop onto a lined tray and bake at 180°C / 350°F for 10–12 minutes.",
-      "Let them rest on the tray for 5 minutes — they finish setting as they cool."
+      "Mix soft butter, sugar, brown sugar, and salt.",
+      "Add eggs + vanilla, mix until smooth.",
+      "Fold in flour + baking soda until just combined.",
+      "Add chocolate chips.",
+      "Scoop onto a baking tray — makes 6 massive cookies.",
+      "Bake at 350°F for 12 minutes."
     ],
-    "notes": "Makes about 12 big cookies. Slightly underbake for extra chew.",
-    "updatedAt": 1784176254638
-  },
-  {
-    "id": "mrmzzirwljv05",
-    "title": "Honey Garlic Chicken Meal Prep Bowls",
-    "category": "mealprep",
-    "servings": 4,
-    "time": "45 min",
-    "image": "",
-    "made": false,
-    "fav": false,
-    "ingredients": [
-      {
-        "qty": 600,
-        "unit": "g",
-        "name": "chicken thighs, diced"
-      },
-      {
-        "qty": 3,
-        "unit": "tbsp",
-        "name": "honey"
-      },
-      {
-        "qty": 3,
-        "unit": "tbsp",
-        "name": "soy sauce"
-      },
-      {
-        "qty": 4,
-        "unit": "cloves",
-        "name": "garlic, minced"
-      },
-      {
-        "qty": 2,
-        "unit": "cups",
-        "name": "rice, uncooked"
-      },
-      {
-        "qty": 2,
-        "unit": "heads",
-        "name": "broccoli, in florets"
-      },
-      {
-        "qty": 1,
-        "unit": "tbsp",
-        "name": "sesame seeds"
-      }
-    ],
-    "steps": [
-      "Cook the rice and steam the broccoli while you prep the chicken.",
-      "Sear the chicken in a hot pan until golden on all sides.",
-      "Add honey, soy sauce, and garlic; simmer until sticky and glossy.",
-      "Divide rice, broccoli, and chicken between 4 containers, sprinkle sesame seeds.",
-      "Fridge for up to 4 days — microwave 2 minutes when it's lunchtime!"
-    ],
-    "notes": "For the boyfriend's work lunches 🍱 double the sauce, trust me.",
-    "updatedAt": 1784176254638
+    "notes": "the trick: spin them with a bowl or cup right out of the oven to shape… then let them rest 😮‍🔥"
   }
 ]
