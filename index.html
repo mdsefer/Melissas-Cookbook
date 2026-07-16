@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Melissa's Cookbook</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ===== Header ===== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-mark">🍳</span>
+        <div>
+          <h1>Melissa's Cookbook</h1>
+          <p class="tagline">Made with love, for two</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input id="searchInput" type="search" placeholder="Search recipes or ingredients…" autocomplete="off" />
+        </div>
+        <button id="addBtn" class="btn btn-primary">＋ Add Recipe</button>
+        <div class="menu-wrap">
+          <button id="menuBtn" class="btn btn-ghost" title="More">⋯</button>
+          <div id="menu" class="menu hidden">
+            <button id="exportBtn" class="menu-item">⬇️ Export recipes (backup)</button>
+            <button id="importBtn" class="menu-item">⬆️ Import recipes</button>
+            <input id="importFile" type="file" accept="application/json" hidden />
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Category tabs ===== -->
+  <nav class="tabs" id="tabs"></nav>
+
+  <!-- ===== Recipe grid ===== -->
+  <main class="container">
+    <div id="grid" class="grid"></div>
+    <div id="emptyState" class="empty hidden">
+      <div class="empty-art">🧑‍🍳</div>
+      <h2>No recipes here yet</h2>
+      <p>Tap <strong>＋ Add Recipe</strong> to save your first one.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>Kept fresh in your browser • Remember to Export now and then to back up 💛</p>
+  </footer>
+
+  <!-- ===== Recipe detail modal ===== -->
+  <div id="detailModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card detail-card">
+      <button class="modal-close" data-close aria-label="Close">✕</button>
+      <div id="detailContent"></div>
+    </div>
+  </div>
+
+  <!-- ===== Add / Edit modal ===== -->
+  <div id="formModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card form-card">
+      <button class="modal-close" data-close aria-label="Close">✕</button>
+      <h2 id="formTitle">Add a Recipe</h2>
+      <form id="recipeForm">
+        <div class="field-row">
+          <label class="field">
+            <span>Recipe name</span>
+            <input name="title" type="text" required placeholder="e.g. Garlic Butter Pasta" />
+          </label>
+        </div>
+
+        <div class="field-row two">
+          <label class="field">
+            <span>Category</span>
+            <select name="category" id="categorySelect"></select>
+          </label>
+          <label class="field">
+            <span>Base servings</span>
+            <input name="servings" type="number" min="1" step="1" value="2" required />
+          </label>
+        </div>
+
+        <div class="field-row two">
+          <label class="field">
+            <span>Prep + cook time (optional)</span>
+            <input name="time" type="text" placeholder="e.g. 30 min" />
+          </label>
+          <label class="field">
+            <span>Photo URL (optional)</span>
+            <input name="image" type="url" placeholder="https://…" />
+          </label>
+        </div>
+
+        <fieldset class="builder">
+          <legend>Ingredients</legend>
+          <p class="builder-hint">Amount &amp; unit are optional — they let the shopping list scale to your serving size.</p>
+          <div id="ingredientList" class="rows"></div>
+          <button type="button" class="btn btn-soft add-row" data-add="ingredient">＋ Add ingredient</button>
+        </fieldset>
+
+        <fieldset class="builder">
+          <legend>Steps</legend>
+          <div id="stepList" class="rows"></div>
+          <button type="button" class="btn btn-soft add-row" data-add="step">＋ Add step</button>
+        </fieldset>
+
+        <label class="field">
+          <span>Notes (optional)</span>
+          <textarea name="notes" rows="2" placeholder="Little tips, swaps, or memories 💭"></textarea>
+        </label>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Recipe</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== Shopping list modal ===== -->
+  <div id="shoppingModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card shopping-card">
+      <button class="modal-close" data-close aria-label="Close">✕</button>
+      <h2>🛒 Shopping List</h2>
+      <p id="shoppingSub" class="shopping-sub"></p>
+      <ul id="shoppingList" class="shopping-list"></ul>
+      <div class="form-actions">
+        <button id="copyListBtn" class="btn btn-soft">📋 Copy list</button>
+        <button id="printListBtn" class="btn btn-primary">🖨️ Print</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
