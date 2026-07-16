@@ -34,6 +34,8 @@ const VIBES = [
 
 /* ---------- State ---------- */
 let recipes = load();
+let diary = loadDiary();
+let view = "recipes"; // "recipes" | "diary"
 let activeCategory = "all";
 let activeVibe = "all";
 let searchTerm = "";
@@ -80,6 +82,28 @@ function loadTomb() {
   try { return JSON.parse(localStorage.getItem(TOMB_KEY)) || {}; } catch (e) { return {}; }
 }
 function saveTomb(t) { localStorage.setItem(TOMB_KEY, JSON.stringify(t)); }
+
+/* ---------- Diary storage 📔 ---------- */
+const DIARY_KEY = "melissas-cookbook-diary-v1";
+const DIARY_TOMB_KEY = "melissas-cookbook-diary-deleted-v1";
+function loadDiary() {
+  try {
+    const raw = localStorage.getItem(DIARY_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    return Array.isArray(list) ? list : [];
+  } catch (e) { return []; }
+}
+function saveDiary() {
+  try {
+    localStorage.setItem(DIARY_KEY, JSON.stringify(diary));
+  } catch (e) {
+    toast("storage is full! 🫣 try removing a photo or two");
+  }
+}
+function loadDiaryTomb() {
+  try { return JSON.parse(localStorage.getItem(DIARY_TOMB_KEY)) || {}; } catch (e) { return {}; }
+}
+function saveDiaryTomb(t) { localStorage.setItem(DIARY_TOMB_KEY, JSON.stringify(t)); }
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
@@ -93,12 +117,45 @@ async function syncFromPublished() {
   try {
     const res = await fetch("recipes.json?v=" + Date.now(), { cache: "no-store" });
     if (!res.ok) return;
-    const published = await res.json();
-    if (!Array.isArray(published)) return;
-    mergePublished(published);
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      // legacy format: just recipes
+      mergePublished(data);
+    } else if (data && typeof data === "object") {
+      mergePublished(Array.isArray(data.recipes) ? data.recipes : []);
+      mergeDiary(Array.isArray(data.diary) ? data.diary : []);
+      saveDiary();
+    } else {
+      return;
+    }
     save();
     renderAll();
   } catch (e) { /* offline or opened as a local file — no biggie */ }
+}
+
+function mergeDiary(published) {
+  const tomb = loadDiaryTomb();
+  const localById = new Map(diary.map((d) => [d.id, d]));
+  const pubIds = new Set();
+  const merged = [];
+  for (const p of published) {
+    if (!p || !p.id) continue;
+    pubIds.add(p.id);
+    if (tomb[p.id] && tomb[p.id] > (p.updatedAt || 0)) continue;
+    const loc = localById.get(p.id);
+    if (loc && loc.dirty && (loc.updatedAt || 0) > (p.updatedAt || 0)) {
+      merged.push(loc);
+    } else {
+      merged.push({ ...p, dirty: false });
+    }
+  }
+  const drafts = diary.filter((d) => !pubIds.has(d.id) && d.dirty);
+  diary = [...drafts, ...merged];
+  let changed = false;
+  for (const id of Object.keys(tomb)) {
+    if (!pubIds.has(id)) { delete tomb[id]; changed = true; }
+  }
+  if (changed) saveDiaryTomb(tomb);
 }
 
 function mergePublished(published) {
@@ -254,6 +311,7 @@ function renderAll() {
   renderVibes();
   renderTabs();
   renderGrid();
+  renderDiary();
 }
 
 /* ============================================================
@@ -408,6 +466,201 @@ document.getElementById("confirmYes").onclick = () => {
   const fn = confirmAction;
   confirmAction = null;
   if (fn) fn();
+};
+
+/* ============================================================
+   Diary 📔
+   ============================================================ */
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function prettyDate(s) {
+  if (!s) return "someday";
+  const [y, m, d] = s.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+}
+
+function setView(v) {
+  view = v;
+  document.getElementById("recipeSide").classList.toggle("hidden", v !== "recipes");
+  document.getElementById("diarySide").classList.toggle("hidden", v !== "diary");
+  document.getElementById("recipesView").classList.toggle("hidden", v !== "recipes");
+  document.getElementById("diaryView").classList.toggle("hidden", v !== "diary");
+  document.getElementById("modeRecipes").classList.toggle("active", v === "recipes");
+  document.getElementById("modeDiary").classList.toggle("active", v === "diary");
+  setDrawer(false);
+}
+document.getElementById("modeRecipes").onclick = () => setView("recipes");
+document.getElementById("modeDiary").onclick = () => setView("diary");
+
+function renderDiary() {
+  const list = [...diary].sort((a, b) =>
+    (b.date || "").localeCompare(a.date || "") || (b.updatedAt || 0) - (a.updatedAt || 0));
+  const wrap = document.getElementById("diaryList");
+  const empty = document.getElementById("diaryEmpty");
+  if (list.length === 0) {
+    wrap.innerHTML = "";
+    empty.classList.remove("hidden");
+    return;
+  }
+  empty.classList.add("hidden");
+  wrap.innerHTML = list.map(entryHTML).join("");
+}
+
+function entryHTML(en) {
+  const r = en.recipeId ? recipes.find((x) => x.id === en.recipeId) : null;
+  const title = r ? r.title : (en.recipeTitle || "something delicious");
+  const chip = r
+    ? `<button class="entry-recipe" data-open="${r.id}">🍽️ ${escapeHtml(title)}</button>`
+    : `<span class="entry-recipe plain">🍽️ ${escapeHtml(title)}</span>`;
+  const hearts = en.rating > 0
+    ? `<div class="entry-hearts">${"💗".repeat(en.rating)}${"🤍".repeat(5 - en.rating)}</div>` : "";
+  const photo = en.image ? `<div class="entry-photo"><img src="${escapeAttr(en.image)}" alt="" /></div>` : "";
+  const note = en.note ? `<p class="entry-note">${escapeHtml(en.note)}</p>` : "";
+  return `<article class="entry" data-id="${en.id}">
+    ${photo}
+    <div class="entry-body">
+      <div class="entry-top">
+        <span class="entry-date">${prettyDate(en.date)}</span>
+        <span class="entry-actions">
+          <button class="entry-btn" data-edit="${en.id}" title="Edit">✏️</button>
+          <button class="entry-btn" data-del="${en.id}" title="Delete">🗑️</button>
+        </span>
+      </div>
+      ${chip}
+      ${hearts}
+      ${note}
+    </div>
+  </article>`;
+}
+
+// diary list interactions
+document.getElementById("diaryList").addEventListener("click", (e) => {
+  const open = e.target.closest("[data-open]");
+  if (open) { openDetail(open.dataset.open); return; }
+  const edit = e.target.closest("[data-edit]");
+  if (edit) { openDiaryForm(edit.dataset.edit); return; }
+  const del = e.target.closest("[data-del]");
+  if (del) {
+    const en = diary.find((x) => x.id === del.dataset.del);
+    askConfirm(`This diary entry from ${prettyDate(en ? en.date : "")} will be gone for good!`, () => {
+      diary = diary.filter((x) => x.id !== del.dataset.del);
+      const tomb = loadDiaryTomb();
+      tomb[del.dataset.del] = Date.now();
+      saveDiaryTomb(tomb);
+      saveDiary();
+      renderDiary();
+      toast("entry deleted 🥀");
+    });
+  }
+});
+
+/* ----- diary entry form ----- */
+const diaryModal = document.getElementById("diaryModal");
+const diaryForm = document.getElementById("diaryForm");
+const diaryRecipeSelect = document.getElementById("diaryRecipeSelect");
+const customTitleField = document.getElementById("customTitleField");
+let editingEntryId = null;
+let diaryRating = 0;
+let diaryImage = "";
+
+function renderRatingPicker() {
+  document.getElementById("ratingPicker").innerHTML = [1, 2, 3, 4, 5].map((n) =>
+    `<button type="button" class="heart-btn" data-r="${n}">${n <= diaryRating ? "💗" : "🤍"}</button>`).join("");
+}
+document.getElementById("ratingPicker").addEventListener("click", (e) => {
+  const btn = e.target.closest(".heart-btn");
+  if (!btn) return;
+  const n = Number(btn.dataset.r);
+  diaryRating = n === diaryRating ? 0 : n; // tap the same heart to clear
+  renderRatingPicker();
+});
+
+function fillRecipeSelect(selectedId) {
+  const opts = [`<option value="">— pick a recipe —</option>`]
+    .concat(recipes.map((r) => `<option value="${r.id}">${escapeHtml(r.title)}</option>`))
+    .concat([`<option value="__custom">✍️ something else…</option>`]);
+  diaryRecipeSelect.innerHTML = opts.join("");
+  diaryRecipeSelect.value = selectedId || "";
+}
+diaryRecipeSelect.addEventListener("change", () => {
+  customTitleField.classList.toggle("hidden", diaryRecipeSelect.value !== "__custom");
+});
+
+function setDiaryImage(src) {
+  diaryImage = src || "";
+  const prev = document.getElementById("diaryPhotoPreview");
+  const img = prev.querySelector("img");
+  if (diaryImage) { img.src = diaryImage; prev.classList.remove("hidden"); }
+  else { img.removeAttribute("src"); prev.classList.add("hidden"); }
+}
+document.getElementById("diaryPhotoBtn").onclick = () => document.getElementById("diaryPhotoFile").click();
+document.getElementById("diaryPhotoFile").onchange = async (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  try {
+    setDiaryImage(await compressImage(file));
+    toast("photo added 📷💕");
+  } catch (err) {
+    toast("hmm, couldn't read that photo 🥺");
+  }
+};
+document.getElementById("diaryPhotoPreview").querySelector(".photo-remove").onclick = () => setDiaryImage("");
+
+function openDiaryForm(id = null) {
+  editingEntryId = id;
+  diaryForm.reset();
+  setDiaryImage("");
+  diaryRating = 0;
+  if (id) {
+    const en = diary.find((x) => x.id === id);
+    document.getElementById("diaryFormTitle").textContent = "Edit Diary Entry ✏️";
+    diaryForm.date.value = en.date || todayStr();
+    const linked = en.recipeId && recipes.some((r) => r.id === en.recipeId);
+    fillRecipeSelect(linked ? en.recipeId : (en.recipeTitle ? "__custom" : ""));
+    diaryForm.customTitle.value = linked ? "" : (en.recipeTitle || "");
+    diaryRating = en.rating || 0;
+    setDiaryImage(en.image || "");
+  } else {
+    document.getElementById("diaryFormTitle").textContent = "Write a Diary Entry 📔";
+    diaryForm.date.value = todayStr();
+    fillRecipeSelect("");
+  }
+  customTitleField.classList.toggle("hidden", diaryRecipeSelect.value !== "__custom");
+  renderRatingPicker();
+  showModal(diaryModal);
+}
+document.getElementById("addEntryBtn").onclick = () => { setDrawer(false); openDiaryForm(); };
+document.getElementById("addEntryBtn2").onclick = () => openDiaryForm();
+
+diaryForm.onsubmit = (e) => {
+  e.preventDefault();
+  const sel = diaryRecipeSelect.value;
+  const linked = sel && sel !== "__custom" ? recipes.find((r) => r.id === sel) : null;
+  const data = {
+    date: diaryForm.date.value || todayStr(),
+    recipeId: linked ? linked.id : "",
+    recipeTitle: linked ? linked.title : diaryForm.customTitle.value.trim(),
+    rating: diaryRating,
+    image: diaryImage,
+    note: diaryForm.note.value.trim(),
+    updatedAt: Date.now(),
+    dirty: true,
+  };
+  if (editingEntryId) {
+    const idx = diary.findIndex((x) => x.id === editingEntryId);
+    diary[idx] = { ...diary[idx], ...data };
+    toast("entry updated ✨");
+  } else {
+    diary.unshift({ id: uid(), ...data });
+    confetti(16);
+    toast("diary entry saved 📔💕");
+  }
+  saveDiary();
+  renderDiary();
+  closeModal(diaryModal);
 };
 
 /* ============================================================
@@ -684,8 +937,13 @@ function compressImage(file) {
    Export / Import
    ============================================================ */
 document.getElementById("exportBtn").onclick = () => {
-  const clean = recipes.map(({ dirty, ...rest }) => rest); // internal flag stays home
-  const blob = new Blob([JSON.stringify(clean, null, 2)], { type: "application/json" });
+  // internal dirty flags stay home; recipes + diary travel together
+  const payload = {
+    kind: "melissas-cookbook",
+    recipes: recipes.map(({ dirty, ...rest }) => rest),
+    diary: diary.map(({ dirty, ...rest }) => rest),
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -704,21 +962,41 @@ document.getElementById("importFile").onchange = (e) => {
   reader.onload = () => {
     try {
       const imported = JSON.parse(reader.result);
-      if (!Array.isArray(imported)) throw new Error("bad format");
+      let inRecipes = [], inDiary = [];
+      if (Array.isArray(imported)) {
+        inRecipes = imported; // legacy backup: just recipes
+      } else if (imported && typeof imported === "object") {
+        inRecipes = Array.isArray(imported.recipes) ? imported.recipes : [];
+        inDiary = Array.isArray(imported.diary) ? imported.diary : [];
+      } else {
+        throw new Error("bad format");
+      }
       // merge, skipping exact-id duplicates; give new ids to anything missing one
       const existingIds = new Set(recipes.map((r) => r.id));
       let added = 0;
-      for (const r of imported) {
+      for (const r of inRecipes) {
         if (!r || !r.title) continue;
         if (!r.id || existingIds.has(r.id)) r.id = uid();
         existingIds.add(r.id);
         recipes.unshift({ made: false, fav: false, ...r, updatedAt: Date.now(), dirty: true });
         added++;
       }
+      const existingEntryIds = new Set(diary.map((d) => d.id));
+      let addedEntries = 0;
+      for (const d of inDiary) {
+        if (!d || !d.date) continue;
+        if (!d.id || existingEntryIds.has(d.id)) d.id = uid();
+        existingEntryIds.add(d.id);
+        diary.unshift({ ...d, updatedAt: Date.now(), dirty: true });
+        addedEntries++;
+      }
       save();
+      saveDiary();
       renderAll();
       toggleMenu(false);
-      toast(`imported ${added} recipe${added === 1 ? "" : "s"} 📥`);
+      const bits = [`${added} recipe${added === 1 ? "" : "s"}`];
+      if (addedEntries) bits.push(`${addedEntries} diary entr${addedEntries === 1 ? "y" : "ies"}`);
+      toast(`imported ${bits.join(" + ")} 📥`);
     } catch (err) {
       toast("that file didn't look like a cookbook backup 🥺");
     }

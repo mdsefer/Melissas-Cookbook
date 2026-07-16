@@ -37,6 +37,7 @@ publishing updates it.
 - 🔍 **Search** — by recipe name or ingredient
 - ⬇️⬆️ **Export / Import** — back up your recipes or share them as a file
 - 🎉 **Confetti** — because marking a recipe "made" deserves a tiny party
+- 📔 **Our diary** — dated entries with the recipe, a heart rating, a photo, and the memory
 
 ## Files
 

@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@500;600;700&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet" />
   <!-- bump the ?v= numbers AND the footer stamp together on every code change -->
-  <link rel="stylesheet" href="styles.css?v=8" />
+  <link rel="stylesheet" href="styles.css?v=9" />
 </head>
 <body>
   <!-- ===== Header ===== -->
@@ -43,22 +43,50 @@
   <!-- ===== Sidebar + recipes ===== -->
   <div class="layout">
     <aside class="sidebar" id="sidebar">
-      <p class="side-script">~ chapters ~</p>
-      <nav id="tabs" class="chapters"></nav>
-      <div class="side-divider"></div>
-      <p class="side-script">show me…</p>
-      <div id="vibes" class="show-list"></div>
-      <div class="side-divider"></div>
-      <button id="surpriseBtn" class="btn btn-surprise side-dice">🎲 pick for us!</button>
+      <div class="mode-switch">
+        <button id="modeRecipes" class="mode-btn active">📖 cookbook</button>
+        <button id="modeDiary" class="mode-btn">📔 our diary</button>
+      </div>
+
+      <div id="recipeSide">
+        <p class="side-script">~ chapters ~</p>
+        <nav id="tabs" class="chapters"></nav>
+        <div class="side-divider"></div>
+        <p class="side-script">show me…</p>
+        <div id="vibes" class="show-list"></div>
+        <div class="side-divider"></div>
+        <button id="surpriseBtn" class="btn btn-surprise side-dice">🎲 pick for us!</button>
+      </div>
+
+      <div id="diarySide" class="hidden">
+        <p class="side-script">~ our food diary ~</p>
+        <p class="side-note">every meal we make together is a little date 💕</p>
+        <button id="addEntryBtn" class="btn btn-primary side-dice">＋ write an entry</button>
+      </div>
     </aside>
 
     <main class="container">
-      <p class="grid-greeting">what are we cooking today, lovebirds? 🍳</p>
-      <div id="grid" class="grid"></div>
-      <div id="emptyState" class="empty hidden">
-        <div class="empty-art">🧁</div>
-        <h2>nothing here yet, cutie!</h2>
-        <p class="empty-script">tap <strong>＋ Add Recipe</strong> and let&rsquo;s fill this page up</p>
+      <div id="recipesView">
+        <p class="grid-greeting">what are we cooking today, lovebirds? 🍳</p>
+        <div id="grid" class="grid"></div>
+        <div id="emptyState" class="empty hidden">
+          <div class="empty-art">🧁</div>
+          <h2>nothing here yet, cutie!</h2>
+          <p class="empty-script">tap <strong>＋ Add Recipe</strong> and let&rsquo;s fill this page up</p>
+        </div>
+      </div>
+
+      <div id="diaryView" class="hidden">
+        <div class="diary-head">
+          <p class="grid-greeting">our little food diary 📔</p>
+          <button id="addEntryBtn2" class="btn btn-primary">＋ write an entry</button>
+        </div>
+        <div id="diaryList" class="diary-list"></div>
+        <div id="diaryEmpty" class="empty hidden">
+          <div class="empty-art">📔</div>
+          <h2>no entries yet!</h2>
+          <p class="empty-script">cook something &amp; come tell the story 💕</p>
+        </div>
       </div>
     </main>
   </div>
@@ -68,7 +96,7 @@
   <div id="drawerBackdrop" class="drawer-backdrop hidden"></div>
 
   <footer class="site-footer">
-    <p>made with 💕 &amp; a lot of butter — export a backup now &amp; then! <span style="opacity:.45;font-size:13px">v8</span></p>
+    <p>made with 💕 &amp; a lot of butter — export a backup now &amp; then! <span style="opacity:.45;font-size:13px">v9</span></p>
   </footer>
 
   <!-- ===== Recipe detail modal ===== -->
@@ -171,6 +199,59 @@
     </div>
   </div>
 
+  <!-- ===== Diary entry modal ===== -->
+  <div id="diaryModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card form-card">
+      <button class="modal-close" data-close aria-label="Close">✕</button>
+      <h2 id="diaryFormTitle">Write a Diary Entry 📔</h2>
+      <form id="diaryForm">
+        <div class="field-row two">
+          <label class="field">
+            <span>When was it?</span>
+            <input name="date" type="date" required />
+          </label>
+          <label class="field">
+            <span>What did we make?</span>
+            <select id="diaryRecipeSelect"></select>
+          </label>
+        </div>
+
+        <label class="field hidden" id="customTitleField">
+          <span>Tell me what it was</span>
+          <input name="customTitle" type="text" placeholder="e.g. midnight grilled cheese 🧀" />
+        </label>
+
+        <div class="field">
+          <span>How was it?</span>
+          <div id="ratingPicker" class="rating-picker"></div>
+        </div>
+
+        <div class="field">
+          <span>Photo (optional)</span>
+          <div class="photo-actions">
+            <button type="button" id="diaryPhotoBtn" class="btn btn-soft">📷 add a photo</button>
+          </div>
+          <div id="diaryPhotoPreview" class="photo-preview hidden">
+            <img alt="diary photo preview" />
+            <button type="button" class="photo-remove" title="Remove photo">✕</button>
+          </div>
+          <input id="diaryPhotoFile" type="file" accept="image/*" hidden />
+        </div>
+
+        <label class="field">
+          <span>The memory 💭</span>
+          <textarea name="note" rows="3" placeholder="he said it was the best one yet…"></textarea>
+        </label>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" data-close>cancel</button>
+          <button type="submit" class="btn btn-primary">save entry 💌</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- ===== Confirm modal (in-app, replaces browser popup) ===== -->
   <div id="confirmModal" class="modal modal-top hidden" role="dialog" aria-modal="true">
     <div class="modal-backdrop" data-close></div>
@@ -187,6 +268,6 @@
 
   <div id="toast" class="toast hidden"></div>
 
-  <script src="app.js?v=8"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>
