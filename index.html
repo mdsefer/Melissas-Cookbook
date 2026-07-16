@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Melissa's Cookbook</title>
+  <title>Melissa's Cookbook 🍓</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍓</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@500;600;700&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -14,16 +15,16 @@
   <header class="site-header">
     <div class="header-inner">
       <div class="brand">
-        <span class="brand-mark">🍳</span>
+        <span class="brand-mark">🍓</span>
         <div>
-          <h1>Melissa's Cookbook</h1>
-          <p class="tagline">Made with love, for two</p>
+          <h1>Melissa&rsquo;s Cookbook</h1>
+          <p class="tagline">made with love, for two 💕</p>
         </div>
       </div>
       <div class="header-actions">
         <div class="search-wrap">
           <span class="search-icon">🔍</span>
-          <input id="searchInput" type="search" placeholder="Search recipes or ingredients…" autocomplete="off" />
+          <input id="searchInput" type="search" placeholder="search recipes or ingredients…" autocomplete="off" />
         </div>
         <button id="addBtn" class="btn btn-primary">＋ Add Recipe</button>
         <div class="menu-wrap">
@@ -38,6 +39,21 @@
     </div>
   </header>
 
+  <!-- ===== Cute hero strip ===== -->
+  <section class="hero">
+    <span class="float-emoji fe-1">🧁</span>
+    <span class="float-emoji fe-2">🍰</span>
+    <span class="float-emoji fe-3">🥞</span>
+    <span class="float-emoji fe-4">🍜</span>
+    <div class="hero-inner">
+      <p class="hero-script">what are we cooking today, lovebirds?</p>
+      <button id="surpriseBtn" class="btn btn-surprise">🎲 pick for us!</button>
+    </div>
+  </section>
+
+  <!-- ===== Vibe filters ===== -->
+  <div class="vibes" id="vibes"></div>
+
   <!-- ===== Category tabs ===== -->
   <nav class="tabs" id="tabs"></nav>
 
@@ -45,14 +61,14 @@
   <main class="container">
     <div id="grid" class="grid"></div>
     <div id="emptyState" class="empty hidden">
-      <div class="empty-art">🧑‍🍳</div>
-      <h2>No recipes here yet</h2>
-      <p>Tap <strong>＋ Add Recipe</strong> to save your first one.</p>
+      <div class="empty-art">🧁</div>
+      <h2>nothing here yet, cutie!</h2>
+      <p class="empty-script">tap <strong>＋ Add Recipe</strong> and let&rsquo;s fill this page up</p>
     </div>
   </main>
 
   <footer class="site-footer">
-    <p>Kept fresh in your browser • Remember to Export now and then to back up 💛</p>
+    <p>made with 💕 &amp; a lot of butter — export a backup now &amp; then!</p>
   </footer>
 
   <!-- ===== Recipe detail modal ===== -->
@@ -74,7 +90,7 @@
         <div class="field-row">
           <label class="field">
             <span>Recipe name</span>
-            <input name="title" type="text" required placeholder="e.g. Garlic Butter Pasta" />
+            <input name="title" type="text" required placeholder="e.g. Strawberry French Toast" />
           </label>
         </div>
 
@@ -100,27 +116,33 @@
           </label>
         </div>
 
+        <label class="switch-row">
+          <input type="checkbox" name="made" />
+          <span class="switch"></span>
+          <span class="switch-label">we&rsquo;ve made this one! 💖</span>
+        </label>
+
         <fieldset class="builder">
-          <legend>Ingredients</legend>
-          <p class="builder-hint">Amount &amp; unit are optional — they let the shopping list scale to your serving size.</p>
+          <legend>🧺 Ingredients</legend>
+          <p class="builder-hint">amount &amp; unit are optional — they let the shopping list scale with your serving size (fractions like 1/2 are fine!)</p>
           <div id="ingredientList" class="rows"></div>
-          <button type="button" class="btn btn-soft add-row" data-add="ingredient">＋ Add ingredient</button>
+          <button type="button" class="btn btn-soft add-row" data-add="ingredient">＋ add ingredient</button>
         </fieldset>
 
         <fieldset class="builder">
-          <legend>Steps</legend>
+          <legend>👩‍🍳 Steps</legend>
           <div id="stepList" class="rows"></div>
-          <button type="button" class="btn btn-soft add-row" data-add="step">＋ Add step</button>
+          <button type="button" class="btn btn-soft add-row" data-add="step">＋ add step</button>
         </fieldset>
 
         <label class="field">
           <span>Notes (optional)</span>
-          <textarea name="notes" rows="2" placeholder="Little tips, swaps, or memories 💭"></textarea>
+          <textarea name="notes" rows="2" placeholder="little tips, swaps, or memories 💭"></textarea>
         </label>
 
         <div class="form-actions">
-          <button type="button" class="btn btn-ghost" data-close>Cancel</button>
-          <button type="submit" class="btn btn-primary">Save Recipe</button>
+          <button type="button" class="btn btn-ghost" data-close>cancel</button>
+          <button type="submit" class="btn btn-primary">save recipe 💌</button>
         </div>
       </form>
     </div>
@@ -135,8 +157,8 @@
       <p id="shoppingSub" class="shopping-sub"></p>
       <ul id="shoppingList" class="shopping-list"></ul>
       <div class="form-actions">
-        <button id="copyListBtn" class="btn btn-soft">📋 Copy list</button>
-        <button id="printListBtn" class="btn btn-primary">🖨️ Print</button>
+        <button id="copyListBtn" class="btn btn-soft">📋 copy list</button>
+        <button id="printListBtn" class="btn btn-primary">🖨️ print</button>
       </div>
     </div>
   </div>

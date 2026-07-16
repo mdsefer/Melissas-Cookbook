@@ -1,23 +1,33 @@
 /* ============================================================
-   Melissa's Cookbook — static recipe app (localStorage)
+   Melissa's Cookbook — candy-pastel edition 🍓 (localStorage)
    ============================================================ */
 
-const STORAGE_KEY = "melissas-cookbook-v1";
+const STORAGE_KEY = "melissas-cookbook-v1"; // same key as before — your recipes are safe!
 
 // Categories: value -> {label, emoji}
 const CATEGORIES = [
-  { value: "breakfast", label: "Breakfast", emoji: "🍳" },
+  { value: "breakfast", label: "Breakfast", emoji: "🥞" },
   { value: "snack",     label: "Snacks",    emoji: "🥨" },
   { value: "meal",      label: "Meals",     emoji: "🍝" },
+  { value: "mealprep",  label: "Meal Prep", emoji: "🍱" },
   { value: "dessert",   label: "Desserts",  emoji: "🍰" },
-  { value: "drink",     label: "Drinks",    emoji: "🥤" },
+  { value: "drink",     label: "Drinks",    emoji: "🧋" },
   { value: "other",     label: "Other",     emoji: "🍽️" },
 ];
 const catInfo = (v) => CATEGORIES.find((c) => c.value === v) || CATEGORIES[CATEGORIES.length - 1];
 
+// Vibe filters: made-it vs wishlist vs favorites
+const VIBES = [
+  { value: "all",   label: "🌈 everything" },
+  { value: "made",  label: "💖 tried & true" },
+  { value: "totry", label: "✨ on the wishlist" },
+  { value: "fav",   label: "⭐ faves" },
+];
+
 /* ---------- State ---------- */
 let recipes = load();
 let activeCategory = "all";
+let activeVibe = "all";
 let searchTerm = "";
 let editingId = null;
 let currentDetail = null;   // recipe currently open in detail view
@@ -25,11 +35,14 @@ let currentServings = null; // chosen serving size in detail view
 
 /* ---------- Storage ---------- */
 function load() {
+  let list = null;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) list = JSON.parse(raw);
   } catch (e) { /* ignore */ }
-  return seedRecipes();
+  if (!Array.isArray(list)) list = seedRecipes();
+  // gentle migration: older recipes get the new fields with defaults
+  return list.map((r) => ({ ...r, made: !!r.made, fav: !!r.fav }));
 }
 function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
@@ -38,7 +51,7 @@ function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
-/* ---------- Seed data (a couple of starters; deletable) ---------- */
+/* ---------- Seed data (starters for a fresh browser; deletable) ---------- */
 function seedRecipes() {
   return [
     {
@@ -48,6 +61,8 @@ function seedRecipes() {
       servings: 2,
       time: "25 min",
       image: "",
+      made: true,
+      fav: true,
       ingredients: [
         { qty: 200, unit: "g", name: "spaghetti" },
         { qty: 3, unit: "tbsp", name: "butter" },
@@ -71,6 +86,8 @@ function seedRecipes() {
       servings: 12,
       time: "30 min",
       image: "",
+      made: true,
+      fav: false,
       ingredients: [
         { qty: 1, unit: "cup", name: "butter, softened" },
         { qty: 1, unit: "cup", name: "brown sugar" },
@@ -88,6 +105,33 @@ function seedRecipes() {
         "Let them rest on the tray for 5 minutes — they finish setting as they cool.",
       ],
       notes: "Makes about 12 big cookies. Slightly underbake for extra chew.",
+    },
+    {
+      id: uid(),
+      title: "Honey Garlic Chicken Meal Prep Bowls",
+      category: "mealprep",
+      servings: 4,
+      time: "45 min",
+      image: "",
+      made: false,
+      fav: false,
+      ingredients: [
+        { qty: 600, unit: "g", name: "chicken thighs, diced" },
+        { qty: 3, unit: "tbsp", name: "honey" },
+        { qty: 3, unit: "tbsp", name: "soy sauce" },
+        { qty: 4, unit: "cloves", name: "garlic, minced" },
+        { qty: 2, unit: "cups", name: "rice, uncooked" },
+        { qty: 2, unit: "heads", name: "broccoli, in florets" },
+        { qty: 1, unit: "tbsp", name: "sesame seeds" },
+      ],
+      steps: [
+        "Cook the rice and steam the broccoli while you prep the chicken.",
+        "Sear the chicken in a hot pan until golden on all sides.",
+        "Add honey, soy sauce, and garlic; simmer until sticky and glossy.",
+        "Divide rice, broccoli, and chicken between 4 containers, sprinkle sesame seeds.",
+        "Fridge for up to 4 days — microwave 2 minutes when it's lunchtime!",
+      ],
+      notes: "For the boyfriend's work lunches 🍱 double the sauce, trust me.",
     },
   ];
 }
@@ -120,6 +164,14 @@ function prettyQty(n) {
 const grid = document.getElementById("grid");
 const emptyState = document.getElementById("emptyState");
 const tabs = document.getElementById("tabs");
+const vibes = document.getElementById("vibes");
+
+function renderVibes() {
+  vibes.innerHTML = VIBES.map((v) => {
+    const active = activeVibe === v.value ? " active" : "";
+    return `<button class="vibe-chip${active}" data-vibe="${v.value}">${v.label}</button>`;
+  }).join("");
+}
 
 function renderTabs() {
   const counts = { all: recipes.length };
@@ -139,6 +191,9 @@ function filteredRecipes() {
   const t = searchTerm.trim().toLowerCase();
   return recipes.filter((r) => {
     if (activeCategory !== "all" && r.category !== activeCategory) return false;
+    if (activeVibe === "made" && !r.made) return false;
+    if (activeVibe === "totry" && r.made) return false;
+    if (activeVibe === "fav" && !r.fav) return false;
     if (!t) return true;
     if (r.title.toLowerCase().includes(t)) return true;
     return (r.ingredients || []).some((i) => (i.name || "").toLowerCase().includes(t));
@@ -162,8 +217,15 @@ function cardHTML(r) {
     ? `<img src="${escapeAttr(r.image)}" alt="" onerror="this.remove()" />`
     : `<span>${info.emoji}</span>`;
   const time = r.time ? `<span>⏱️ ${escapeHtml(r.time)}</span>` : "";
+  const sticker = r.made
+    ? `<span class="status-sticker made">💖 tried &amp; true</span>`
+    : `<span class="status-sticker totry">✨ on the list</span>`;
   return `<article class="card" data-id="${r.id}">
-    <div class="card-thumb">${thumb}</div>
+    <div class="card-thumb">
+      ${thumb}
+      <button class="fav-btn" data-fav title="${r.fav ? "Un-favorite" : "Favorite!"}">${r.fav ? "❤️" : "🤍"}</button>
+      ${sticker}
+    </div>
     <div class="card-body">
       <span class="card-cat">${info.emoji} ${info.label}</span>
       <h3>${escapeHtml(r.title)}</h3>
@@ -176,8 +238,27 @@ function cardHTML(r) {
 }
 
 function renderAll() {
+  renderVibes();
   renderTabs();
   renderGrid();
+}
+
+/* ============================================================
+   Confetti 🎉
+   ============================================================ */
+const CONFETTI_BITS = ["💖", "✨", "🍓", "🎀", "🌸", "💛", "⭐", "🧁"];
+function confetti(n = 26) {
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement("span");
+    s.className = "confetti-bit";
+    s.textContent = CONFETTI_BITS[Math.floor(Math.random() * CONFETTI_BITS.length)];
+    s.style.left = Math.random() * 100 + "vw";
+    s.style.animationDelay = Math.random() * 0.35 + "s";
+    s.style.fontSize = 14 + Math.random() * 18 + "px";
+    s.style.setProperty("--drift", Math.random() * 140 - 70 + "px");
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 2200);
+  }
 }
 
 /* ============================================================
@@ -213,7 +294,7 @@ function renderDetail() {
   const stepsHTML = (r.steps || []).map((s) => `<li>${escapeHtml(s)}</li>`).join("");
 
   const scaledNote = currentServings !== r.servings
-    ? `<span class="scaled-note">scaled from ${r.servings}</span>` : "";
+    ? `<span class="scaled-note">scaled from ${r.servings} ✨</span>` : "";
 
   const notesHTML = r.notes ? `<div class="detail-notes">📝 ${escapeHtml(r.notes)}</div>` : "";
   const timeHTML = r.time ? ` • ⏱️ ${escapeHtml(r.time)}` : "";
@@ -222,35 +303,44 @@ function renderDetail() {
     <div class="detail-hero">${hero}</div>
     <div class="detail-cat">${info.emoji} ${info.label}</div>
     <h2 class="detail-title">${escapeHtml(r.title)}</h2>
-    <div class="detail-meta">Recipe makes ${r.servings} serving${r.servings == 1 ? "" : "s"}${timeHTML}</div>
+    <div class="detail-meta">recipe makes ${r.servings} serving${r.servings == 1 ? "" : "s"}${timeHTML}</div>
+
+    <div class="love-row">
+      <button class="toggle-pill${r.made ? " on-made" : ""}" id="madeToggle">
+        ${r.made ? "💖 we made this!" : "👩‍🍳 mark as made"}
+      </button>
+      <button class="toggle-pill${r.fav ? " on-fav" : ""}" id="favToggle">
+        ${r.fav ? "⭐ a favorite!" : "☆ add to faves"}
+      </button>
+    </div>
 
     <div class="serving-bar">
-      <span class="label">🍽️ Serving size</span>
+      <span class="label">🍽️ serving size</span>
       <div class="stepper">
         <button type="button" id="servMinus" aria-label="Fewer">−</button>
         <span class="val" id="servVal">${currentServings}</span>
         <button type="button" id="servPlus" aria-label="More">＋</button>
       </div>
       ${scaledNote}
-      <button class="btn btn-primary" id="shopBtn">🛒 Shopping List</button>
+      <button class="btn btn-primary" id="shopBtn">🛒 shopping list</button>
     </div>
 
     ${notesHTML}
 
     <div class="detail-columns">
       <div class="detail-section">
-        <h3>Ingredients</h3>
+        <h3>🧺 Ingredients</h3>
         <ul class="ingredients-ul">${ingredientsHTML || "<li>No ingredients listed</li>"}</ul>
       </div>
       <div class="detail-section">
-        <h3>Steps</h3>
+        <h3>👩‍🍳 Steps</h3>
         <ol class="steps-ol">${stepsHTML || "<li>No steps listed</li>"}</ol>
       </div>
     </div>
 
     <div class="detail-footer-actions">
-      <button class="btn btn-danger" id="deleteBtn">🗑️ Delete</button>
-      <button class="btn btn-soft" id="editBtn">✏️ Edit</button>
+      <button class="btn btn-danger" id="deleteBtn">🗑️ delete</button>
+      <button class="btn btn-soft" id="editBtn">✏️ edit</button>
     </div>
   `;
 
@@ -259,6 +349,21 @@ function renderDetail() {
   document.getElementById("shopBtn").onclick = openShoppingList;
   document.getElementById("editBtn").onclick = () => { closeModal(detailModal); openForm(r.id); };
   document.getElementById("deleteBtn").onclick = () => deleteRecipe(r.id);
+
+  document.getElementById("madeToggle").onclick = () => {
+    r.made = !r.made;
+    save();
+    renderAll();
+    renderDetail();
+    if (r.made) { confetti(30); toast("yayyy, chef!! 💖👩‍🍳"); }
+  };
+  document.getElementById("favToggle").onclick = () => {
+    r.fav = !r.fav;
+    save();
+    renderAll();
+    renderDetail();
+    if (r.fav) toast("added to faves ⭐");
+  };
 }
 
 function deleteRecipe(id) {
@@ -268,8 +373,21 @@ function deleteRecipe(id) {
   save();
   closeModal(detailModal);
   renderAll();
-  toast("Recipe deleted");
+  toast("recipe deleted 🥀");
 }
+
+/* ============================================================
+   Surprise picker 🎲
+   ============================================================ */
+document.getElementById("surpriseBtn").onclick = () => {
+  let pool = filteredRecipes();
+  if (pool.length === 0) pool = recipes;
+  if (pool.length === 0) { toast("add a recipe first, cutie! 🥺"); return; }
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  confetti(14);
+  openDetail(pick.id);
+  toast(`🎲 fate says: ${pick.title}!`);
+};
 
 /* ============================================================
    Shopping list
@@ -317,9 +435,9 @@ function shoppingListText() {
 document.getElementById("copyListBtn").onclick = async () => {
   try {
     await navigator.clipboard.writeText(shoppingListText());
-    toast("Shopping list copied 📋");
+    toast("shopping list copied 📋💕");
   } catch (e) {
-    toast("Couldn't copy — try selecting the text");
+    toast("couldn't copy — try selecting the text");
   }
 };
 document.getElementById("printListBtn").onclick = () => window.print();
@@ -340,7 +458,7 @@ function ingredientRow(data = { qty: "", unit: "", name: "" }) {
   const div = document.createElement("div");
   div.className = "ing-row";
   div.innerHTML = `
-    <input class="ing-qty" type="text" inputmode="decimal" placeholder="Amt" value="${escapeAttr(data.qty === 0 ? "" : data.qty ?? "")}" />
+    <input class="ing-qty" type="text" inputmode="decimal" placeholder="amt" value="${escapeAttr(data.qty === 0 ? "" : data.qty ?? "")}" />
     <input class="ing-unit" type="text" placeholder="unit" value="${escapeAttr(data.unit ?? "")}" />
     <input class="ing-name" type="text" placeholder="ingredient" value="${escapeAttr(data.name ?? "")}" />
     <button type="button" class="row-del" title="Remove">✕</button>`;
@@ -353,7 +471,7 @@ function stepRow(text = "") {
   div.className = "step-row";
   div.innerHTML = `
     <span class="step-num"></span>
-    <textarea class="step-text" rows="1" placeholder="Describe this step…">${escapeHtml(text)}</textarea>
+    <textarea class="step-text" rows="1" placeholder="describe this step…">${escapeHtml(text)}</textarea>
     <button type="button" class="row-del" title="Remove">✕</button>`;
   div.querySelector(".row-del").onclick = () => { div.remove(); renumberSteps(); };
   return div;
@@ -371,17 +489,18 @@ function openForm(id = null) {
 
   if (id) {
     const r = recipes.find((x) => x.id === id);
-    document.getElementById("formTitle").textContent = "Edit Recipe";
+    document.getElementById("formTitle").textContent = "Edit Recipe ✏️";
     recipeForm.title.value = r.title;
     recipeForm.category.value = r.category;
     recipeForm.servings.value = r.servings;
     recipeForm.time.value = r.time || "";
     recipeForm.image.value = r.image || "";
     recipeForm.notes.value = r.notes || "";
+    recipeForm.made.checked = !!r.made;
     (r.ingredients || []).forEach((i) => ingredientList.appendChild(ingredientRow(i)));
     (r.steps || []).forEach((s) => stepList.appendChild(stepRow(s)));
   } else {
-    document.getElementById("formTitle").textContent = "Add a Recipe";
+    document.getElementById("formTitle").textContent = "Add a Recipe 🧁";
     ingredientList.appendChild(ingredientRow());
     ingredientList.appendChild(ingredientRow());
     stepList.appendChild(stepRow());
@@ -412,6 +531,7 @@ recipeForm.onsubmit = (e) => {
     time: fd.get("time").trim(),
     image: fd.get("image").trim(),
     notes: fd.get("notes").trim(),
+    made: fd.get("made") === "on",
     ingredients,
     steps,
   };
@@ -419,10 +539,11 @@ recipeForm.onsubmit = (e) => {
   if (editingId) {
     const idx = recipes.findIndex((x) => x.id === editingId);
     recipes[idx] = { ...recipes[idx], ...data };
-    toast("Recipe updated ✨");
+    toast("recipe updated ✨");
   } else {
-    recipes.unshift({ id: uid(), ...data });
-    toast("Recipe saved 💛");
+    recipes.unshift({ id: uid(), fav: false, ...data });
+    confetti(20);
+    toast("recipe saved 💌");
   }
   save();
   renderAll();
@@ -466,7 +587,7 @@ document.getElementById("exportBtn").onclick = () => {
   a.click();
   URL.revokeObjectURL(url);
   toggleMenu(false);
-  toast("Backup downloaded ⬇️");
+  toast("backup downloaded ⬇️💕");
 };
 
 document.getElementById("importBtn").onclick = () => document.getElementById("importFile").click();
@@ -485,15 +606,15 @@ document.getElementById("importFile").onchange = (e) => {
         if (!r || !r.title) continue;
         if (!r.id || existingIds.has(r.id)) r.id = uid();
         existingIds.add(r.id);
-        recipes.unshift(r);
+        recipes.unshift({ made: false, fav: false, ...r });
         added++;
       }
       save();
       renderAll();
       toggleMenu(false);
-      toast(`Imported ${added} recipe${added === 1 ? "" : "s"} 📥`);
+      toast(`imported ${added} recipe${added === 1 ? "" : "s"} 📥`);
     } catch (err) {
-      toast("That file didn't look like a cookbook backup");
+      toast("that file didn't look like a cookbook backup 🥺");
     }
   };
   reader.readAsText(file);
@@ -513,8 +634,20 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") document.querySelectorAll(".modal:not(.hidden)").forEach(closeModal);
 });
 
-// grid click -> open detail
+// grid click -> fav heart or open detail
 grid.addEventListener("click", (e) => {
+  const favBtn = e.target.closest(".fav-btn");
+  if (favBtn) {
+    const card = favBtn.closest(".card");
+    const r = recipes.find((x) => x.id === card.dataset.id);
+    if (r) {
+      r.fav = !r.fav;
+      save();
+      renderAll();
+      if (r.fav) toast("added to faves ⭐");
+    }
+    return;
+  }
   const card = e.target.closest(".card");
   if (card) openDetail(card.dataset.id);
 });
@@ -524,6 +657,14 @@ tabs.addEventListener("click", (e) => {
   const tab = e.target.closest(".tab");
   if (!tab) return;
   activeCategory = tab.dataset.cat;
+  renderAll();
+});
+
+// vibe chips
+vibes.addEventListener("click", (e) => {
+  const chip = e.target.closest(".vibe-chip");
+  if (!chip) return;
+  activeVibe = chip.dataset.vibe;
   renderAll();
 });
 
@@ -574,4 +715,5 @@ document.addEventListener("input", (e) => {
 });
 
 /* ---------- Go ---------- */
+save(); // persist migrated fields right away
 renderAll();

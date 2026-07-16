@@ -12,12 +12,16 @@ Just open **`index.html`** in your browser. That's it.
 
 ## Features
 
-- 🗂️ **Categories** — Breakfast, Snacks, Meals, Desserts, Drinks, Other
+- 🗂️ **Categories** — Breakfast, Snacks, Meals, **Meal Prep** 🍱, Desserts, Drinks, Other
+- 💖 **Tried & true vs. ✨ on the wishlist** — track what you've made and what you're dreaming about
+- ⭐ **Favorites** — heart the keepers, filter to just the faves
+- 🎲 **"Pick for us!"** — can't decide? let fate choose dinner
 - ➕ **Add / edit recipes** — ingredients, steps, time, photo, and notes
 - 🍽️ **Serving-size scaling** — amounts rescale automatically (with nice fractions)
 - 🛒 **Shopping list** — scaled to your servings, with copy & print
 - 🔍 **Search** — by recipe name or ingredient
 - ⬇️⬆️ **Export / Import** — back up your recipes or share them as a file
+- 🎉 **Confetti** — because marking a recipe "made" deserves a tiny party
 
 ## Files
 
