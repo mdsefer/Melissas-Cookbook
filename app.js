@@ -119,95 +119,11 @@ function mergePublished(published) {
   if (changed) saveTomb(tomb);
 }
 
-/* ---------- Seed data (starters for a fresh browser; deletable) ---------- */
+/* ---------- Seed data ----------
+   The shared cookbook (recipes.json) is the source of truth now,
+   so fresh browsers start empty and fill up on the first sync. */
 function seedRecipes() {
-  return [
-    {
-      id: uid(),
-      title: "Garlic Butter Pasta",
-      category: "meal",
-      servings: 2,
-      time: "25 min",
-      image: "",
-      made: true,
-      fav: true,
-      updatedAt: 0,
-      dirty: false,
-      ingredients: [
-        { qty: 200, unit: "g", name: "spaghetti" },
-        { qty: 3, unit: "tbsp", name: "butter" },
-        { qty: 4, unit: "cloves", name: "garlic, minced" },
-        { qty: 0.25, unit: "cup", name: "parmesan, grated" },
-        { qty: 1, unit: "pinch", name: "chili flakes" },
-        { qty: 0, unit: "", name: "salt & fresh parsley to taste" },
-      ],
-      steps: [
-        "Boil the spaghetti in salted water until al dente, then reserve a splash of pasta water.",
-        "Melt butter in a pan over low heat and cook the garlic until fragrant (don't brown it).",
-        "Toss in the drained pasta with a little pasta water and the chili flakes.",
-        "Off the heat, stir through parmesan and parsley. Salt to taste and serve warm.",
-      ],
-      notes: "Our cozy Friday-night go-to. Add shrimp to make it fancy 💕",
-    },
-    {
-      id: uid(),
-      title: "Chewy Chocolate Chip Cookies",
-      category: "dessert",
-      servings: 12,
-      time: "30 min",
-      image: "",
-      made: true,
-      fav: false,
-      updatedAt: 0,
-      dirty: false,
-      ingredients: [
-        { qty: 1, unit: "cup", name: "butter, softened" },
-        { qty: 1, unit: "cup", name: "brown sugar" },
-        { qty: 0.5, unit: "cup", name: "white sugar" },
-        { qty: 2, unit: "", name: "eggs" },
-        { qty: 2.25, unit: "cups", name: "flour" },
-        { qty: 1, unit: "tsp", name: "baking soda" },
-        { qty: 2, unit: "cups", name: "chocolate chips" },
-      ],
-      steps: [
-        "Cream the butter with both sugars until fluffy.",
-        "Beat in the eggs one at a time.",
-        "Mix in flour and baking soda, then fold in the chocolate chips.",
-        "Scoop onto a lined tray and bake at 180°C / 350°F for 10–12 minutes.",
-        "Let them rest on the tray for 5 minutes — they finish setting as they cool.",
-      ],
-      notes: "Makes about 12 big cookies. Slightly underbake for extra chew.",
-    },
-    {
-      id: uid(),
-      title: "Honey Garlic Chicken Meal Prep Bowls",
-      category: "mealprep",
-      servings: 4,
-      time: "45 min",
-      image: "",
-      made: false,
-      fav: false,
-      updatedAt: 0,
-      dirty: false,
-      ingredients: [
-        { qty: 600, unit: "g", name: "chicken thighs, diced" },
-        { qty: 3, unit: "tbsp", name: "honey" },
-        { qty: 3, unit: "tbsp", name: "soy sauce" },
-        { qty: 4, unit: "cloves", name: "garlic, minced" },
-        { qty: 2, unit: "cups", name: "rice, uncooked" },
-        { qty: 2, unit: "heads", name: "broccoli, in florets" },
-        { qty: 1, unit: "tbsp", name: "sesame seeds" },
-      ],
-      steps: [
-        "Cook the rice and steam the broccoli while you prep the chicken.",
-        "Sear the chicken in a hot pan until golden on all sides.",
-        "Add honey, soy sauce, and garlic; simmer until sticky and glossy.",
-        "Divide rice, broccoli, and chicken between 4 containers, sprinkle sesame seeds.",
-        "Fridge for up to 4 days — microwave 2 minutes when it's lunchtime!",
-      ],
-      notes: "For the boyfriend's work lunches 🍱 double the sauce, trust me.",
-    },
-  ];
+  return [];
 }
 
 /* ---------- Number / fraction helpers ---------- */
