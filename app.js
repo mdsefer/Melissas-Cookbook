@@ -18,10 +18,10 @@ const catInfo = (v) => CATEGORIES.find((c) => c.value === v) || CATEGORIES[CATEG
 
 // Vibe filters: made-it vs wishlist vs favorites
 const VIBES = [
-  { value: "all",   label: "🌈 everything" },
-  { value: "made",  label: "💖 tried & true" },
-  { value: "totry", label: "✨ on the wishlist" },
-  { value: "fav",   label: "⭐ faves" },
+  { value: "all",   label: "everything",   emoji: "🌈" },
+  { value: "made",  label: "tried & true", emoji: "💖" },
+  { value: "totry", label: "wishlist",     emoji: "✨" },
+  { value: "fav",   label: "faves",        emoji: "⭐" },
 ];
 
 /* ---------- State ---------- */
@@ -241,9 +241,17 @@ const tabs = document.getElementById("tabs");
 const vibes = document.getElementById("vibes");
 
 function renderVibes() {
+  const counts = {
+    all: recipes.length,
+    made: recipes.filter((r) => r.made).length,
+    totry: recipes.filter((r) => !r.made).length,
+    fav: recipes.filter((r) => r.fav).length,
+  };
   vibes.innerHTML = VIBES.map((v) => {
     const active = activeVibe === v.value ? " active" : "";
-    return `<button class="vibe-chip${active}" data-vibe="${v.value}">${v.label}</button>`;
+    return `<button class="vibe-chip${active}" data-vibe="${v.value}">
+      <span class="t-emoji">${v.emoji}</span><span class="t-label">${v.label}</span><span class="count">${counts[v.value]}</span>
+    </button>`;
   }).join("");
 }
 
@@ -251,12 +259,12 @@ function renderTabs() {
   const counts = { all: recipes.length };
   for (const c of CATEGORIES) counts[c.value] = recipes.filter((r) => r.category === c.value).length;
 
-  const items = [{ value: "all", label: "All", emoji: "📖" }, ...CATEGORIES];
+  const items = [{ value: "all", label: "All recipes", emoji: "📖" }, ...CATEGORIES];
   tabs.innerHTML = items.map((c) => {
     const n = counts[c.value] || 0;
     const active = activeCategory === c.value ? " active" : "";
     return `<button class="tab${active}" data-cat="${c.value}">
-      ${c.emoji} ${c.label}<span class="count">${n}</span>
+      <span class="t-emoji">${c.emoji}</span><span class="t-label">${c.label}</span><span class="count">${n}</span>
     </button>`;
   }).join("");
 }
@@ -464,6 +472,7 @@ document.getElementById("surpriseBtn").onclick = () => {
   if (pool.length === 0) { toast("add a recipe first, cutie! 🥺"); return; }
   const pick = pool[Math.floor(Math.random() * pool.length)];
   confetti(14);
+  setDrawer(false);
   openDetail(pick.id);
   toast(`🎲 fate says: ${pick.title}!`);
 };
@@ -735,21 +744,33 @@ grid.addEventListener("click", (e) => {
   if (card) openDetail(card.dataset.id);
 });
 
-// tabs
+// tabs (chapters)
 tabs.addEventListener("click", (e) => {
   const tab = e.target.closest(".tab");
   if (!tab) return;
   activeCategory = tab.dataset.cat;
   renderAll();
+  setDrawer(false);
 });
 
-// vibe chips
+// vibe chips (show me…)
 vibes.addEventListener("click", (e) => {
   const chip = e.target.closest(".vibe-chip");
   if (!chip) return;
   activeVibe = chip.dataset.vibe;
   renderAll();
+  setDrawer(false);
 });
+
+// mobile chapters drawer
+const sidebar = document.getElementById("sidebar");
+const drawerBackdrop = document.getElementById("drawerBackdrop");
+function setDrawer(open) {
+  sidebar.classList.toggle("open", open);
+  drawerBackdrop.classList.toggle("hidden", !open);
+}
+document.getElementById("drawerBtn").onclick = () => setDrawer(true);
+drawerBackdrop.onclick = () => setDrawer(false);
 
 // search
 document.getElementById("searchInput").addEventListener("input", (e) => {

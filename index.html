@@ -39,33 +39,32 @@
     </div>
   </header>
 
-  <!-- ===== Cute hero strip ===== -->
-  <section class="hero">
-    <span class="float-emoji fe-1">🧁</span>
-    <span class="float-emoji fe-2">🍰</span>
-    <span class="float-emoji fe-3">🥞</span>
-    <span class="float-emoji fe-4">🍜</span>
-    <div class="hero-inner">
-      <p class="hero-script">what are we cooking today, lovebirds?</p>
-      <button id="surpriseBtn" class="btn btn-surprise">🎲 pick for us!</button>
-    </div>
-  </section>
+  <!-- ===== Sidebar + recipes ===== -->
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <p class="side-script">~ chapters ~</p>
+      <nav id="tabs" class="chapters"></nav>
+      <div class="side-divider"></div>
+      <p class="side-script">show me…</p>
+      <div id="vibes" class="show-list"></div>
+      <div class="side-divider"></div>
+      <button id="surpriseBtn" class="btn btn-surprise side-dice">🎲 pick for us!</button>
+    </aside>
 
-  <!-- ===== Vibe filters ===== -->
-  <div class="vibes" id="vibes"></div>
+    <main class="container">
+      <p class="grid-greeting">what are we cooking today, lovebirds? 🍳</p>
+      <div id="grid" class="grid"></div>
+      <div id="emptyState" class="empty hidden">
+        <div class="empty-art">🧁</div>
+        <h2>nothing here yet, cutie!</h2>
+        <p class="empty-script">tap <strong>＋ Add Recipe</strong> and let&rsquo;s fill this page up</p>
+      </div>
+    </main>
+  </div>
 
-  <!-- ===== Category tabs ===== -->
-  <nav class="tabs" id="tabs"></nav>
-
-  <!-- ===== Recipe grid ===== -->
-  <main class="container">
-    <div id="grid" class="grid"></div>
-    <div id="emptyState" class="empty hidden">
-      <div class="empty-art">🧁</div>
-      <h2>nothing here yet, cutie!</h2>
-      <p class="empty-script">tap <strong>＋ Add Recipe</strong> and let&rsquo;s fill this page up</p>
-    </div>
-  </main>
+  <!-- mobile drawer controls -->
+  <button id="drawerBtn" class="drawer-btn">📖 chapters</button>
+  <div id="drawerBackdrop" class="drawer-backdrop hidden"></div>
 
   <footer class="site-footer">
     <p>made with 💕 &amp; a lot of butter — export a backup now &amp; then!</p>
