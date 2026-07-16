@@ -61,7 +61,11 @@ function load() {
   });
 }
 function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
+  } catch (e) {
+    toast("storage is full! 🫣 try removing a photo or two");
+  }
 }
 
 // mark a recipe as changed-by-us so it wins over the published copy
@@ -518,6 +522,8 @@ function openForm(id = null) {
   ingredientList.innerHTML = "";
   stepList.innerHTML = "";
 
+  setFormImage("");
+
   if (id) {
     const r = recipes.find((x) => x.id === id);
     document.getElementById("formTitle").textContent = "Edit Recipe ✏️";
@@ -525,7 +531,7 @@ function openForm(id = null) {
     recipeForm.category.value = r.category;
     recipeForm.servings.value = r.servings;
     recipeForm.time.value = r.time || "";
-    recipeForm.image.value = r.image || "";
+    setFormImage(r.image || "");
     recipeForm.notes.value = r.notes || "";
     recipeForm.made.checked = !!r.made;
     (r.ingredients || []).forEach((i) => ingredientList.appendChild(ingredientRow(i)));
@@ -560,7 +566,7 @@ recipeForm.onsubmit = (e) => {
     category: fd.get("category"),
     servings: Math.max(1, parseInt(fd.get("servings"), 10) || 1),
     time: fd.get("time").trim(),
-    image: fd.get("image").trim(),
+    image: formImage || fd.get("image").trim(),
     notes: fd.get("notes").trim(),
     made: fd.get("made") === "on",
     ingredients,
@@ -607,6 +613,72 @@ document.querySelectorAll("[data-add]").forEach((btn) => {
     }
   };
 });
+
+/* ---------- Photo picker 📷 ----------
+   Uploaded photos are shrunk + compressed and stored inside the recipe
+   itself, so they travel along with exports and publishes. */
+let formImage = ""; // the photo attached while the form is open
+const photoFile = document.getElementById("photoFile");
+const photoPreview = document.getElementById("photoPreview");
+const photoPreviewImg = photoPreview.querySelector("img");
+
+function setFormImage(src) {
+  formImage = src || "";
+  if (formImage) {
+    photoPreviewImg.src = formImage;
+    photoPreview.classList.remove("hidden");
+  } else {
+    photoPreviewImg.removeAttribute("src");
+    photoPreview.classList.add("hidden");
+  }
+}
+
+document.getElementById("photoUploadBtn").onclick = () => photoFile.click();
+
+photoFile.onchange = async (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  try {
+    setFormImage(await compressImage(file));
+    recipeForm.image.value = ""; // uploaded photo replaces any pasted link
+    toast("photo added 📷💕");
+  } catch (err) {
+    toast("hmm, couldn't read that photo 🥺");
+  }
+};
+
+photoPreview.querySelector(".photo-remove").onclick = () => setFormImage("");
+
+// typing a link switches back to link mode
+recipeForm.image.addEventListener("input", () => {
+  if (recipeForm.image.value.trim()) setFormImage("");
+});
+
+// shrink to max 900px and compress so storage stays happy
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("read failed"));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("decode failed"));
+      img.onload = () => {
+        const MAX = 900;
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", 0.78));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 /* ============================================================
    Export / Import

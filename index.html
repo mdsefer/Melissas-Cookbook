@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@500;600;700&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet" />
   <!-- bump the ?v= numbers AND the footer stamp together on every code change -->
-  <link rel="stylesheet" href="styles.css?v=7" />
+  <link rel="stylesheet" href="styles.css?v=8" />
 </head>
 <body>
   <!-- ===== Header ===== -->
@@ -68,7 +68,7 @@
   <div id="drawerBackdrop" class="drawer-backdrop hidden"></div>
 
   <footer class="site-footer">
-    <p>made with 💕 &amp; a lot of butter — export a backup now &amp; then! <span style="opacity:.45;font-size:13px">v7</span></p>
+    <p>made with 💕 &amp; a lot of butter — export a backup now &amp; then! <span style="opacity:.45;font-size:13px">v8</span></p>
   </footer>
 
   <!-- ===== Recipe detail modal ===== -->
@@ -110,10 +110,18 @@
             <span>Prep + cook time (optional)</span>
             <input name="time" type="text" placeholder="e.g. 30 min" />
           </label>
-          <label class="field">
-            <span>Photo URL (optional)</span>
-            <input name="image" type="url" placeholder="https://…" />
-          </label>
+          <div class="field">
+            <span>Photo (optional)</span>
+            <div class="photo-actions">
+              <button type="button" id="photoUploadBtn" class="btn btn-soft">📷 add a photo</button>
+              <input name="image" type="url" placeholder="…or paste an image link" />
+            </div>
+            <div id="photoPreview" class="photo-preview hidden">
+              <img alt="recipe photo preview" />
+              <button type="button" class="photo-remove" title="Remove photo">✕</button>
+            </div>
+            <input id="photoFile" type="file" accept="image/*" hidden />
+          </div>
         </div>
 
         <label class="switch-row">
@@ -179,6 +187,6 @@
 
   <div id="toast" class="toast hidden"></div>
 
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
