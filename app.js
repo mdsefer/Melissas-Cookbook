@@ -16,6 +16,14 @@ const CATEGORIES = [
 ];
 const catInfo = (v) => CATEGORIES.find((c) => c.value === v) || CATEGORIES[CATEGORIES.length - 1];
 
+// The original preloaded sample recipes are permanently retired — they get
+// dropped from device storage AND ignored if an old publish brings them back.
+const RETIRED_SAMPLES = new Set([
+  "Garlic Butter Pasta",
+  "Chewy Chocolate Chip Cookies",
+  "Honey Garlic Chicken Meal Prep Bowls",
+]);
+
 // Vibe filters: made-it vs wishlist vs favorites
 const VIBES = [
   { value: "all",   label: "everything",   emoji: "🌈" },
@@ -41,13 +49,7 @@ function load() {
     if (raw) list = JSON.parse(raw);
   } catch (e) { /* ignore */ }
   if (!Array.isArray(list)) list = seedRecipes();
-  // one-time cleanup: the original preloaded sample recipes are retired —
-  // devices that stored them early on drop them here for good
-  const RETIRED_SAMPLES = new Set([
-    "Garlic Butter Pasta",
-    "Chewy Chocolate Chip Cookies",
-    "Honey Garlic Chicken Meal Prep Bowls",
-  ]);
+  // drop retired samples that older versions stored on this device
   list = list.filter((r) => r && !RETIRED_SAMPLES.has(r.title));
   // gentle migration: older recipes get the new fields with defaults.
   // Anything without a timestamp predates syncing — mark it as "ours"
@@ -103,6 +105,7 @@ function mergePublished(published) {
 
   for (const p of published) {
     if (!p || !p.id || !p.title) continue;
+    if (RETIRED_SAMPLES.has(p.title)) continue; // stale publishes can't revive them
     pubIds.add(p.id);
     // deleted locally after this was published? keep it gone
     if (tomb[p.id] && tomb[p.id] > (p.updatedAt || 0)) continue;

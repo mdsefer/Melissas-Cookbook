@@ -52,6 +52,14 @@ if (-not $pending) {
 
 git -C "$repo" commit -m "Publish recipes" | Out-Null
 git -C "$repo" push
+
+# tuck the used export away so an old file can't get re-published by accident
+try {
+  Rename-Item -Path $latest.FullName -NewName ($latest.Name + ".published") -ErrorAction Stop
+  Write-Host ""
+  Write-Host "  (Tucked away $($latest.Name) - next publish needs a fresh export.)"
+} catch {}
+
 Write-Host ""
 Write-Host "  Published! Give it a minute or two to go live,"
 Write-Host "  then tell him to refresh the page <3"
