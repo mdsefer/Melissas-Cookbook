@@ -6,7 +6,7 @@
     "servings": 10,
     "time": "1 hr 10 min",
     "image": "",
-    "made": false,
+    "made": true,
     "fav": false,
     "updatedAt": 1784250000000,
     "ingredients": [
