@@ -41,6 +41,14 @@ function load() {
     if (raw) list = JSON.parse(raw);
   } catch (e) { /* ignore */ }
   if (!Array.isArray(list)) list = seedRecipes();
+  // one-time cleanup: the original preloaded sample recipes are retired —
+  // devices that stored them early on drop them here for good
+  const RETIRED_SAMPLES = new Set([
+    "Garlic Butter Pasta",
+    "Chewy Chocolate Chip Cookies",
+    "Honey Garlic Chicken Meal Prep Bowls",
+  ]);
+  list = list.filter((r) => r && !RETIRED_SAMPLES.has(r.title));
   // gentle migration: older recipes get the new fields with defaults.
   // Anything without a timestamp predates syncing — mark it as "ours"
   // (dirty) so the published file can never overwrite or drop it.
