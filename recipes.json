@@ -2,7 +2,7 @@
   {
     "id": "banana-bread",
     "title": "Banana Bread",
-    "category": "snack",
+    "category": "dessert",
     "servings": 10,
     "time": "1 hr 10 min",
     "image": "",
@@ -19,7 +19,7 @@
       { "qty": 0.5, "unit": "tsp", "name": "salt" },
       { "qty": 0.5, "unit": "tsp", "name": "vanilla extract" },
       { "qty": 1, "unit": "cup", "name": "walnuts" },
-      { "qty": 0.5, "unit": "cup", "name": "raisins" }
+      { "qty": 0.5, "unit": "cup", "name": "chocolate chips" }
     ],
     "steps": [
       "Preheat the oven to 350°F. Grease and flour a bread loaf pan (9.25 long x 5.25 wide x 2.75 deep).",
@@ -27,14 +27,14 @@
       "In a mixing bowl, cream together the softened butter and sugar (or honey if using honey).",
       "Mash bananas with a fork until the consistency of chunky applesauce and add them to the batter along with the eggs, mixing until blended.",
       "In a separate bowl, whisk together the flour, baking soda and salt, then add to the batter.",
-      "Add the vanilla extract and mix in the chopped walnuts and raisins. Pour into the prepared loaf pan.",
+      "Add the vanilla extract and mix in the chopped walnuts and chocolate chips. Pour into the prepared loaf pan.",
       "Bake at 350°F for 55–60 min, or until a toothpick inserted into the center comes out clean. Let the banana bread rest for 10 min before transferring to a wire rack to cool."
     ],
     "notes": "Prep 10 min, bake ~1 hour. The sugar can be swapped for honey 🍯"
   },
   {
     "id": "arsenios-crunch-cookie",
-    "title": "arsenio's crunch cookie 🍪",
+    "title": "Arsenio's Crunch Cookie 🍪",
     "category": "dessert",
     "servings": 6,
     "time": "12 min bake",
