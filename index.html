@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@500;600;700&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet" />
   <!-- bump the ?v= numbers AND the footer stamp together on every code change -->
-  <link rel="stylesheet" href="styles.css?v=6" />
+  <link rel="stylesheet" href="styles.css?v=7" />
 </head>
 <body>
   <!-- ===== Header ===== -->
@@ -68,7 +68,7 @@
   <div id="drawerBackdrop" class="drawer-backdrop hidden"></div>
 
   <footer class="site-footer">
-    <p>made with 💕 &amp; a lot of butter — export a backup now &amp; then! <span style="opacity:.45;font-size:13px">v6</span></p>
+    <p>made with 💕 &amp; a lot of butter — export a backup now &amp; then! <span style="opacity:.45;font-size:13px">v7</span></p>
   </footer>
 
   <!-- ===== Recipe detail modal ===== -->
@@ -163,8 +163,22 @@
     </div>
   </div>
 
+  <!-- ===== Confirm modal (in-app, replaces browser popup) ===== -->
+  <div id="confirmModal" class="modal modal-top hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card confirm-card">
+      <div class="confirm-emoji">🥺</div>
+      <h2>wait, really?</h2>
+      <p id="confirmText" class="confirm-text"></p>
+      <div class="form-actions confirm-actions">
+        <button type="button" class="btn btn-ghost" data-close>keep it 💕</button>
+        <button type="button" class="btn btn-danger" id="confirmYes">🗑️ yes, delete</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast hidden"></div>
 
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>

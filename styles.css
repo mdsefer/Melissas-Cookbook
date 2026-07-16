@@ -639,6 +639,14 @@ textarea { resize: vertical; }
 .shopping-list input[type=checkbox] { width: 19px; height: 19px; accent-color: var(--pink-deep); cursor: pointer; flex-shrink: 0; }
 .shopping-list li.checked span { text-decoration: line-through; color: var(--ink-soft); }
 
+/* ===== Confirm modal ===== */
+.modal-top { z-index: 80; }
+.confirm-card { max-width: 390px; text-align: center; }
+.confirm-emoji { font-size: 46px; }
+.confirm-card h2 { font-size: 25px; margin: 6px 0 4px; }
+.confirm-text { color: var(--ink-soft); font-weight: 600; font-size: 14.5px; margin: 0 0 18px; }
+.confirm-actions { justify-content: center; }
+
 /* ===== Toast ===== */
 .toast {
   position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%);

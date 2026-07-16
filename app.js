@@ -379,16 +379,32 @@ function renderDetail() {
 
 function deleteRecipe(id) {
   const r = recipes.find((x) => x.id === id);
-  if (!confirm(`Delete "${r ? r.title : "this recipe"}"? This can't be undone.`)) return;
-  recipes = recipes.filter((x) => x.id !== id);
-  const tomb = loadTomb();
-  tomb[id] = Date.now();
-  saveTomb(tomb);
-  save();
-  closeModal(detailModal);
-  renderAll();
-  toast("recipe deleted 🥀");
+  askConfirm(`"${r ? r.title : "this recipe"}" will be gone for good — no undo!`, () => {
+    recipes = recipes.filter((x) => x.id !== id);
+    const tomb = loadTomb();
+    tomb[id] = Date.now();
+    saveTomb(tomb);
+    save();
+    closeModal(detailModal);
+    renderAll();
+    toast("recipe deleted 🥀");
+  });
 }
+
+/* cute in-app confirm — replaces the browser popup */
+const confirmModal = document.getElementById("confirmModal");
+let confirmAction = null;
+function askConfirm(message, onYes) {
+  document.getElementById("confirmText").textContent = message;
+  confirmAction = onYes;
+  showModal(confirmModal);
+}
+document.getElementById("confirmYes").onclick = () => {
+  closeModal(confirmModal);
+  const fn = confirmAction;
+  confirmAction = null;
+  if (fn) fn();
+};
 
 /* ============================================================
    Surprise picker 🎲
@@ -643,13 +659,20 @@ document.getElementById("importFile").onchange = (e) => {
    Modal + misc helpers
    ============================================================ */
 function showModal(m) { m.classList.remove("hidden"); document.body.style.overflow = "hidden"; }
-function closeModal(m) { m.classList.add("hidden"); document.body.style.overflow = ""; }
+function closeModal(m) {
+  m.classList.add("hidden");
+  // keep the page scroll-locked while another modal is still open underneath
+  if (!document.querySelector(".modal:not(.hidden)")) document.body.style.overflow = "";
+}
 
 document.querySelectorAll(".modal").forEach((m) => {
   m.querySelectorAll("[data-close]").forEach((el) => (el.onclick = () => closeModal(m)));
 });
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") document.querySelectorAll(".modal:not(.hidden)").forEach(closeModal);
+  if (e.key !== "Escape") return;
+  // close only the topmost open modal
+  const open = document.querySelectorAll(".modal:not(.hidden)");
+  if (open.length) closeModal(open[open.length - 1]);
 });
 
 // grid click -> fav heart or open detail
