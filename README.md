@@ -8,7 +8,22 @@ saved right in your browser, so there's no server or database to run.
 
 ## Use it
 
-Just open **`index.html`** in your browser. That's it.
+**Live site:** https://mdsefer.github.io/Melissas-Cookbook/ — bookmark it, add it to
+your phone's home screen, done. (Opening `index.html` locally also works.)
+
+## How sharing works 💕
+
+Melissa's browser is the master cookbook. The live site serves whatever is in
+`recipes.json` — the *published* cookbook — so both of us always see the same thing.
+
+**To publish new recipes (or made-it marks, faves, edits):**
+
+1. In the cookbook, click the **⋯ menu → Export recipes** (downloads a file)
+2. Double-click **`publish.bat`** in this folder
+3. Wait a minute, tell him to refresh 👀
+
+Local changes on other devices never overwrite the published cookbook — only
+publishing updates it.
 
 ## Features
 

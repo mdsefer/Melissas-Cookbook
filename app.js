@@ -41,14 +41,82 @@ function load() {
     if (raw) list = JSON.parse(raw);
   } catch (e) { /* ignore */ }
   if (!Array.isArray(list)) list = seedRecipes();
-  // gentle migration: older recipes get the new fields with defaults
-  return list.map((r) => ({ ...r, made: !!r.made, fav: !!r.fav }));
+  // gentle migration: older recipes get the new fields with defaults.
+  // Anything without a timestamp predates syncing — mark it as "ours"
+  // (dirty) so the published file can never overwrite or drop it.
+  return list.map((r) => {
+    const out = { ...r, made: !!r.made, fav: !!r.fav };
+    if (typeof out.updatedAt !== "number") { out.updatedAt = Date.now(); out.dirty = true; }
+    return out;
+  });
 }
 function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
 }
+
+// mark a recipe as changed-by-us so it wins over the published copy
+function touch(r) {
+  r.updatedAt = Date.now();
+  r.dirty = true;
+}
+
+/* tombstones: remember deletes so a published copy doesn't resurrect them */
+const TOMB_KEY = "melissas-cookbook-deleted-v1";
+function loadTomb() {
+  try { return JSON.parse(localStorage.getItem(TOMB_KEY)) || {}; } catch (e) { return {}; }
+}
+function saveTomb(t) { localStorage.setItem(TOMB_KEY, JSON.stringify(t)); }
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+/* ---------- Published cookbook sync ----------
+   recipes.json is the shared, published cookbook (updated via publish.bat).
+   On the hosted site everyone loads it; your local unpublished changes
+   (dirty) always win on your own device. On file:// the fetch just fails
+   quietly and everything works like before. */
+async function syncFromPublished() {
+  try {
+    const res = await fetch("recipes.json?v=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) return;
+    const published = await res.json();
+    if (!Array.isArray(published)) return;
+    mergePublished(published);
+    save();
+    renderAll();
+  } catch (e) { /* offline or opened as a local file — no biggie */ }
+}
+
+function mergePublished(published) {
+  const tomb = loadTomb();
+  const localById = new Map(recipes.map((r) => [r.id, r]));
+  const pubIds = new Set();
+  const merged = [];
+
+  for (const p of published) {
+    if (!p || !p.id || !p.title) continue;
+    pubIds.add(p.id);
+    // deleted locally after this was published? keep it gone
+    if (tomb[p.id] && tomb[p.id] > (p.updatedAt || 0)) continue;
+    const loc = localById.get(p.id);
+    if (loc && loc.dirty && (loc.updatedAt || 0) > (p.updatedAt || 0)) {
+      merged.push(loc); // our newer unpublished version wins
+    } else {
+      merged.push({ ...p, made: !!p.made, fav: !!p.fav, dirty: false });
+    }
+  }
+
+  // our drafts / edits that aren't published yet stay at the top;
+  // non-dirty leftovers (e.g. starter recipes) defer to the published list
+  const drafts = recipes.filter((r) => !pubIds.has(r.id) && r.dirty);
+  recipes = [...drafts, ...merged];
+
+  // prune tombstones that no longer matter
+  let changed = false;
+  for (const id of Object.keys(tomb)) {
+    if (!pubIds.has(id)) { delete tomb[id]; changed = true; }
+  }
+  if (changed) saveTomb(tomb);
 }
 
 /* ---------- Seed data (starters for a fresh browser; deletable) ---------- */
@@ -63,6 +131,8 @@ function seedRecipes() {
       image: "",
       made: true,
       fav: true,
+      updatedAt: 0,
+      dirty: false,
       ingredients: [
         { qty: 200, unit: "g", name: "spaghetti" },
         { qty: 3, unit: "tbsp", name: "butter" },
@@ -88,6 +158,8 @@ function seedRecipes() {
       image: "",
       made: true,
       fav: false,
+      updatedAt: 0,
+      dirty: false,
       ingredients: [
         { qty: 1, unit: "cup", name: "butter, softened" },
         { qty: 1, unit: "cup", name: "brown sugar" },
@@ -115,6 +187,8 @@ function seedRecipes() {
       image: "",
       made: false,
       fav: false,
+      updatedAt: 0,
+      dirty: false,
       ingredients: [
         { qty: 600, unit: "g", name: "chicken thighs, diced" },
         { qty: 3, unit: "tbsp", name: "honey" },
@@ -352,6 +426,7 @@ function renderDetail() {
 
   document.getElementById("madeToggle").onclick = () => {
     r.made = !r.made;
+    touch(r);
     save();
     renderAll();
     renderDetail();
@@ -359,6 +434,7 @@ function renderDetail() {
   };
   document.getElementById("favToggle").onclick = () => {
     r.fav = !r.fav;
+    touch(r);
     save();
     renderAll();
     renderDetail();
@@ -370,6 +446,9 @@ function deleteRecipe(id) {
   const r = recipes.find((x) => x.id === id);
   if (!confirm(`Delete "${r ? r.title : "this recipe"}"? This can't be undone.`)) return;
   recipes = recipes.filter((x) => x.id !== id);
+  const tomb = loadTomb();
+  tomb[id] = Date.now();
+  saveTomb(tomb);
   save();
   closeModal(detailModal);
   renderAll();
@@ -534,6 +613,8 @@ recipeForm.onsubmit = (e) => {
     made: fd.get("made") === "on",
     ingredients,
     steps,
+    updatedAt: Date.now(),
+    dirty: true,
   };
 
   if (editingId) {
@@ -579,7 +660,8 @@ document.querySelectorAll("[data-add]").forEach((btn) => {
    Export / Import
    ============================================================ */
 document.getElementById("exportBtn").onclick = () => {
-  const blob = new Blob([JSON.stringify(recipes, null, 2)], { type: "application/json" });
+  const clean = recipes.map(({ dirty, ...rest }) => rest); // internal flag stays home
+  const blob = new Blob([JSON.stringify(clean, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -606,7 +688,7 @@ document.getElementById("importFile").onchange = (e) => {
         if (!r || !r.title) continue;
         if (!r.id || existingIds.has(r.id)) r.id = uid();
         existingIds.add(r.id);
-        recipes.unshift({ made: false, fav: false, ...r });
+        recipes.unshift({ made: false, fav: false, ...r, updatedAt: Date.now(), dirty: true });
         added++;
       }
       save();
@@ -642,6 +724,7 @@ grid.addEventListener("click", (e) => {
     const r = recipes.find((x) => x.id === card.dataset.id);
     if (r) {
       r.fav = !r.fav;
+      touch(r);
       save();
       renderAll();
       if (r.fav) toast("added to faves ⭐");
@@ -717,3 +800,4 @@ document.addEventListener("input", (e) => {
 /* ---------- Go ---------- */
 save(); // persist migrated fields right away
 renderAll();
+syncFromPublished(); // then blend in the shared published cookbook
