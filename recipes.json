@@ -2,6 +2,237 @@
   "kind": "melissas-cookbook",
   "recipes": [
     {
+      "id": "steak-fries-green-peppercorn",
+      "title": "Steak Fries with Green Peppercorn Sauce 🥩🍟",
+      "category": "meal",
+      "servings": 2,
+      "time": "45 min",
+      "image": "",
+      "made": false,
+      "fav": false,
+      "updatedAt": 1784579401393,
+      "ingredients": [
+        {
+          "qty": 0,
+          "unit": "",
+          "name": "— For the steak —"
+        },
+        {
+          "qty": 2,
+          "unit": "",
+          "name": "sirloin steaks"
+        },
+        {
+          "qty": 30,
+          "unit": "g",
+          "name": "butter"
+        },
+        {
+          "qty": 1,
+          "unit": "tbsp",
+          "name": "oil"
+        },
+        {
+          "qty": 2,
+          "unit": "",
+          "name": "garlic cloves, crushed"
+        },
+        {
+          "qty": 0,
+          "unit": "",
+          "name": "thyme & rosemary"
+        },
+        {
+          "qty": 0,
+          "unit": "",
+          "name": "salt"
+        },
+        {
+          "qty": 0,
+          "unit": "",
+          "name": "freshly ground black pepper"
+        },
+        {
+          "qty": 0,
+          "unit": "",
+          "name": "— Green peppercorn sauce —"
+        },
+        {
+          "qty": 300,
+          "unit": "ml",
+          "name": "cream"
+        },
+        {
+          "qty": 2,
+          "unit": "tbsp",
+          "name": "green peppercorns in brine"
+        },
+        {
+          "qty": 50,
+          "unit": "ml",
+          "name": "dry white wine"
+        },
+        {
+          "qty": 1,
+          "unit": "tbsp",
+          "name": "beef stock concentrate"
+        },
+        {
+          "qty": 1,
+          "unit": "tbsp",
+          "name": "soy sauce"
+        },
+        {
+          "qty": 1,
+          "unit": "tsp",
+          "name": "mustard"
+        },
+        {
+          "qty": 1,
+          "unit": "",
+          "name": "shallot, finely chopped"
+        },
+        {
+          "qty": 1,
+          "unit": "tsp",
+          "name": "salt"
+        },
+        {
+          "qty": 0,
+          "unit": "",
+          "name": "— For the fries —"
+        },
+        {
+          "qty": 2,
+          "unit": "",
+          "name": "baking potatoes"
+        },
+        {
+          "qty": 0,
+          "unit": "",
+          "name": "oil for frying"
+        },
+        {
+          "qty": 2,
+          "unit": "tbsp",
+          "name": "chopped parsley"
+        },
+        {
+          "qty": 2,
+          "unit": "tbsp",
+          "name": "grated Parmesan"
+        },
+        {
+          "qty": 1,
+          "unit": "",
+          "name": "garlic clove, finely grated"
+        },
+        {
+          "qty": 0,
+          "unit": "",
+          "name": "salt"
+        }
+      ],
+      "steps": [
+        "Pat the sirloin steaks dry and season generously with salt and freshly ground black pepper.",
+        "Heat the oil in a pan over high heat and sear the steaks 2–3 min per side. Add the butter, crushed garlic, thyme and rosemary, and spoon the foaming butter over the steaks for another minute. Rest for 5 min before slicing.",
+        "For the sauce, soften the finely chopped shallot in the same pan. Pour in the white wine and let it reduce by half.",
+        "Stir in the cream, green peppercorns, beef stock concentrate, soy sauce, mustard and salt. Simmer, stirring, until the sauce coats the back of a spoon.",
+        "Cut the baking potatoes into fries and fry in hot oil until deep golden and crisp. Drain on paper towel.",
+        "Toss the hot fries with the chopped parsley, grated Parmesan, grated garlic and a pinch of salt.",
+        "Serve the sliced steak with the fries and spoon the green peppercorn sauce over the top."
+      ],
+      "notes": "Method added from the ingredient list — tweak the timings to how you like your steak 💕"
+    },
+    {
+      "id": "banana-chocolate-chip-muffins",
+      "title": "Banana Chocolate Chip Muffins 🍌🧁",
+      "category": "dessert",
+      "servings": 12,
+      "time": "1 hr rest + 20 min bake",
+      "image": "",
+      "made": false,
+      "fav": false,
+      "updatedAt": 1784579401394,
+      "ingredients": [
+        {
+          "qty": 3,
+          "unit": "",
+          "name": "large ripe bananas, finely mashed"
+        },
+        {
+          "qty": 1.5,
+          "unit": "cups",
+          "name": "all-purpose flour (190g)"
+        },
+        {
+          "qty": 6,
+          "unit": "tbsp",
+          "name": "unsalted butter, melted (85g)"
+        },
+        {
+          "qty": 0.5,
+          "unit": "cup",
+          "name": "granulated sugar (100g)"
+        },
+        {
+          "qty": 0.3333333333333333,
+          "unit": "cup",
+          "name": "brown sugar (65g)"
+        },
+        {
+          "qty": 1,
+          "unit": "",
+          "name": "egg, room temp"
+        },
+        {
+          "qty": 0.75,
+          "unit": "tsp",
+          "name": "baking soda"
+        },
+        {
+          "qty": 0.5,
+          "unit": "tsp",
+          "name": "baking powder"
+        },
+        {
+          "qty": 0,
+          "unit": "",
+          "name": "pinch of salt"
+        },
+        {
+          "qty": 1,
+          "unit": "tsp",
+          "name": "cinnamon (optional)"
+        },
+        {
+          "qty": 1,
+          "unit": "tbsp",
+          "name": "vanilla bean paste / vanilla extract"
+        },
+        {
+          "qty": 0.25,
+          "unit": "cup",
+          "name": "sour cream or whole milk Greek yogurt, room temp (60g)"
+        },
+        {
+          "qty": 1,
+          "unit": "cup",
+          "name": "semi-sweet chocolate chips (250g), + more for topping"
+        }
+      ],
+      "steps": [
+        "In a mixing bowl, roughly mash the bananas. Add the brown sugar and granulated sugar and mix well to combine.",
+        "Crack in the egg and mix for 2–3 min until the mixture turns a light, pale color.",
+        "Add the melted butter, vanilla bean paste and sour cream, and mix until well combined and blended.",
+        "In a separate bowl, mix the dry ingredients: flour, baking powder, baking soda, salt and cinnamon.",
+        "Add the dry ingredients to the wet batter and gently fold in. Add the chocolate chips and fold just to combine — do not over mix.",
+        "Let the batter sit at room temperature for 1 hour, undisturbed, before baking.",
+        "Scoop into a lined muffin tin, top with extra chocolate chips, and bake until a toothpick comes out clean (about 18–22 min at 350°F / 375°F for taller tops)."
+      ],
+      "notes": "The original recipe didn't give a bake time/temp — 350–375°F for ~18–22 min is a safe starting point. Resting the batter 1 hr makes them extra tender 🧁"
+    },
+    {
       "id": "banana-bread",
       "title": "Banana Bread",
       "category": "dessert",
